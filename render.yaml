@@ -5,7 +5,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
-    healthCheckPath: /api/status  # 健康检查路径保持不变，现在可以正常工作
+    healthCheckPath: /  # 修改为根路径或 /metrics，确保健康检查能正确响应 frps Web UI
     envVars:
       # --- 关键变更：配置 frps 使用 WebSocket 模式 ---
 
