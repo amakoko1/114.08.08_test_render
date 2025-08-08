@@ -1,0 +1,38 @@
+# render.yaml
+services:
+  - type: web # 必須是 web 類型才能附加 TCP 端口
+    name: frps-server # 您可以自訂服務名稱
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free # 明確指定使用免費方案
+    region: oregon # 選擇一個支援免費 TCP 服務的區域
+
+    # --- 健康檢查 ---
+    # 確保 frps 服務正常運行，並給予足夠的啟動時間
+    healthCheck:
+      path: /api/status
+      port: 7500 # 指向 Dashboard 的端口
+      initialDelaySeconds: 30
+
+    # --- 端口配置 ---
+    ports:
+      - port: 7500 # frps Dashboard 的 HTTP 端口
+        protocol: HTTP
+      - port: 7000 # frps 客戶端連接的 TCP 端口
+        protocol: TCP
+
+    # --- 環境變數 (所有 frps 的配置都在這裡) ---
+    envVars:
+      # --- 基礎服務配置 ---
+      - key: FRP__SERVER__BIND_PORT
+        value: "7000" # 必須與上面的 TCP 端口對應
+      # --- Dashboard 網頁服務配置 ---
+      - key: FRP__WEBSERVER__PORT
+        value: "7500" # 必須與上面的 HTTP 端口對應
+      - key: FRP__WEBSERVER__USER
+        value: "admin" # Dashboard 登入用戶名
+      # --- 安全性配置 (由 Render 自動生成) ---
+      - key: FRP__AUTH__TOKEN
+        generateValue: true # 關鍵：Render 會自動生成一個安全的 token
+      - key: FRP__WEBSERVER__PASSWORD
+        generateValue: true # 關鍵：Render 會自動生成一個安全的 Dashboard 密碼
