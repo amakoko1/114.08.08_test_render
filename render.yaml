@@ -5,15 +5,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
-    healthCheck:
-      path: /api/status
-      port: 7500
-      initialDelaySeconds: 30
-    ports:
-      - port: 7500
-        protocol: HTTP
-      - port: 7000
-        protocol: TCP
+    healthCheckPath: /api/status
     envVars:
       - key: FRP__SERVER__BIND_PORT
         value: "7000"
