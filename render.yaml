@@ -5,15 +5,30 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
-    healthCheckPath: /api/status
+    healthCheckPath: /api/status  # 健康检查路径保持不变，现在可以正常工作
     envVars:
-      - key: FRP__SERVER__BIND_PORT
-        value: "7000"
+      # --- 关键变更：配置 frps 使用 WebSocket 模式 ---
+
+      # 1. (移除) 不再需要原生TCP绑定端口 BIND_PORT。
+
+      # 2. (新增) 让 frps 的 vhost HTTP 监听器使用 Render 提供的端口。
+      #    这将处理所有传入的 WebSocket 代理请求。
+      - key: FRP__SERVER__VHOST_HTTP_PORT
+        fromEnv: PORT # 关键：使用 Render 注入的 $PORT 环境变量
+
+      # 3. (新增) 设置子域名主机，这是 vhost 模式正确工作所必需的。
+      - key: FRP__SERVER__SUBDOMAIN_HOST
+        fromEnv: RENDER_EXTERNAL_HOSTNAME # 关键：使用 Render 提供的外部主机名
+
+      # --- Web UI 和认证配置 ---
+
+      # 4. (修改) 让 Web UI 也监听同一个 Render 提供的端口。
       - key: FRP__WEBSERVER__PORT
-        value: "7500"
+        fromEnv: PORT # 关键：与 VHOST_HTTP_PORT 使用同一个端口
+
       - key: FRP__WEBSERVER__USER
-        value: "admin"
-      - key: FRP__AUTH__TOKEN
-        generateValue: true
+        value: "admin" # Web UI 用户名，可自行修改
       - key: FRP__WEBSERVER__PASSWORD
-        generateValue: true
+        generateValue: true # 自动生成安全的密码
+      - key: FRP__AUTH__TOKEN
+        generateValue: true # 自动生成安全的认证令牌
