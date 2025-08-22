@@ -1,30 +1,27 @@
 services:
-  - type: web
-    name: tws-proxy-4000
-    runtime: python
-    protocol: tcp
-    plan: starter
-    region: singapore
-    branch: main
-    autoDeploy: false # 在設定完成前先關閉自動部署
-    startCommand: "python proxy.py"
-    envVars:
-      - key: TARGET_HOST
-        value: ndc1.ibllc.com
-      - key: TARGET_PORT
-        value: 4000
-
-  - type: web
-    name: tws-proxy-4001
-    runtime: python
-    protocol: tcp
-    plan: starter
-    region: singapore
-    branch: main
-    autoDeploy: false # 在設定完成前先關閉自動部署
-    startCommand: "python proxy.py"
-    envVars:
-      - key: TARGET_HOST
-        value: ndc1.ibllc.com
-      - key: TARGET_PORT
-        value: 4001
+- type: web
+  name: tws-proxy-4000
+  runtime: python
+  protocol: tcp
+  plan: starter
+  region: singapore
+  branch: main
+  startCommand: "python proxy.py"
+  envVars:
+    - key: TARGET_HOST
+      value: ndc1.ibllc.com
+    - key: TARGET_PORT
+      value: 4000
+- type: web
+  name: tws-proxy-4001
+  runtime: python
+  protocol: tcp
+  plan: starter
+  region: singapore
+  branch: main
+  startCommand: "python proxy.py"
+  envVars:
+    - key: TARGET_HOST
+      value: ndc1.ibllc.com
+    - key: TARGET_PORT
+      value: 4001
