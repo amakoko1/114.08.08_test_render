@@ -1,46 +1,37 @@
+# render.yaml (Corrected Version)
 services:
-  # --- 第一個代理服務, 用於轉發 4000 埠 ---
-  - type: pserv # pserv 代表 Private Service (私有服務)
+  # --- 服務一：代理 TWS 4000 埠 ---
+  - type: web # 關鍵修正：對於需要公開 TCP 埠的服務，類型應設為 'web'
     name: tws-proxy-4000
-    runtime: python # 指定執行環境
-    plan: starter # 必須使用付費方案以避免休眠，例如 'starter'
-    region: singapore # 選擇離您近的地區
-    branch: main # 指定要部署的 Git 分支
-    healthCheckPath: / # 私有服務也建議保留一個基礎的健康檢查
-    buildFilter:
-      paths:
-      - "proxy.py"
-      - "requirements.txt"
-      - "render.yaml"
-    startCommand: "python proxy.py" # 服務的啟動指令
-    envVars: # 環境變數
+    runtime: python
+    protocol: tcp # 關鍵修正：明確告訴 Render 這是一個 TCP 服務，而不是 HTTP
+    plan: starter
+    region: singapore
+    branch: main
+    # 移除 'healthCheckPath'，因為它不適用於 TCP 服務
+    buildCommand: "pip install -r requirements.txt" # 建議加上 build 指令，更具可讀性
+    startCommand: "python proxy.py"
+    envVars:
       - key: TARGET_HOST
         value: ndc1.ibllc.com
       - key: TARGET_PORT
         value: 4000
-    ports: # 設定 TCP 埠映射
-      - port: 10000 # 腳本內部監聽的埠 (os.environ.get('PORT'))
-        fromPort: 10000 # 指定 Render 分配的公開埠應對應到容器的哪個埠
+    # 移除 'ports' 區塊。
+    # 當 'protocol' 設為 'tcp' 時，Render 會自動分配一個公開埠，
+    # 並將流量轉發到由 'PORT' 環境變數指定的內部埠 (我們的腳本會讀取它)。
 
-  # --- 第二個代理服務, 用於轉發 4001 埠 ---
-  - type: pserv
+  # --- 服務二：代理 TWS 4001 埠 ---
+  - type: web # 關鍵修正：同上
     name: tws-proxy-4001
     runtime: python
+    protocol: tcp # 關鍵修正：同上
     plan: starter
     region: singapore
     branch: main
-    healthCheckPath: /
-    buildFilter:
-      paths:
-      - "proxy.py"
-      - "requirements.txt"
-      - "render.yaml"
+    buildCommand: "pip install -r requirements.txt"
     startCommand: "python proxy.py"
     envVars:
       - key: TARGET_HOST
-        value: ndc1.ibllc.com # 目標主機通常是相同的
+        value: ndc1.ibllc.com
       - key: TARGET_PORT
-        value: 4001 # 唯一的區別是目標埠
-    ports:
-      - port: 10000
-        fromPort: 10000
+        value: 4001
