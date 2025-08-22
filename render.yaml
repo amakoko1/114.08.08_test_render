@@ -19,7 +19,7 @@ services:
   - type: pserv # 關鍵修正：同上
     name: tws-proxy-4001
     runtime: python
-    plan: starter
+    plan: free
     region: singapore
     branch: main
     autoDeploy: false
