@@ -1,0 +1,46 @@
+services:
+  # --- 第一個代理服務, 用於轉發 4000 埠 ---
+  - type: pserv # pserv 代表 Private Service (私有服務)
+    name: tws-proxy-4000
+    runtime: python # 指定執行環境
+    plan: starter # 必須使用付費方案以避免休眠，例如 'starter'
+    region: singapore # 選擇離您近的地區
+    branch: main # 指定要部署的 Git 分支
+    healthCheckPath: / # 私有服務也建議保留一個基礎的健康檢查
+    buildFilter:
+      paths:
+      - "proxy.py"
+      - "requirements.txt"
+      - "render.yaml"
+    startCommand: "python proxy.py" # 服務的啟動指令
+    envVars: # 環境變數
+      - key: TARGET_HOST
+        value: ndc1.ibllc.com
+      - key: TARGET_PORT
+        value: 4000
+    ports: # 設定 TCP 埠映射
+      - port: 10000 # 腳本內部監聽的埠 (os.environ.get('PORT'))
+        fromPort: 10000 # 指定 Render 分配的公開埠應對應到容器的哪個埠
+
+  # --- 第二個代理服務, 用於轉發 4001 埠 ---
+  - type: pserv
+    name: tws-proxy-4001
+    runtime: python
+    plan: starter
+    region: singapore
+    branch: main
+    healthCheckPath: /
+    buildFilter:
+      paths:
+      - "proxy.py"
+      - "requirements.txt"
+      - "render.yaml"
+    startCommand: "python proxy.py"
+    envVars:
+      - key: TARGET_HOST
+        value: ndc1.ibllc.com # 目標主機通常是相同的
+      - key: TARGET_PORT
+        value: 4001 # 唯一的區別是目標埠
+    ports:
+      - port: 10000
+        fromPort: 10000
