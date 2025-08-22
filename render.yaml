@@ -4,7 +4,7 @@ services:
   - type: pserv # 關鍵修正：將類型改回 Private Service (pserv)
     name: tws-proxy-4000
     runtime: python
-    plan: starter
+    plan: free
     region: singapore
     branch: main
     autoDeploy: false # 建議在除錯時關閉自動部署
