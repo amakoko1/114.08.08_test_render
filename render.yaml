@@ -1,27 +1,31 @@
+# render.yaml (Corrected for Private Service Creation)
 services:
-- type: web
-  name: tws-proxy-4000
-  runtime: python
-  protocol: tcp
-  plan: starter
-  region: singapore
-  branch: main
-  startCommand: "python proxy.py"
-  envVars:
-    - key: TARGET_HOST
-      value: ndc1.ibllc.com
-    - key: TARGET_PORT
-      value: 4000
-- type: web
-  name: tws-proxy-4001
-  runtime: python
-  protocol: tcp
-  plan: starter
-  region: singapore
-  branch: main
-  startCommand: "python proxy.py"
-  envVars:
-    - key: TARGET_HOST
-      value: ndc1.ibllc.com
-    - key: TARGET_PORT
-      value: 4001
+  # --- 服務一：代理 TWS 4000 埠 ---
+  - type: pserv # 關鍵修正：將類型改回 Private Service (pserv)
+    name: tws-proxy-4000
+    runtime: python
+    plan: starter
+    region: singapore
+    branch: main
+    autoDeploy: false # 建議在除錯時關閉自動部署
+    startCommand: "python proxy.py"
+    envVars:
+      - key: TARGET_HOST
+        value: ndc1.ibllc.com
+      - key: TARGET_PORT
+        value: 4000
+
+  # --- 服務二：代理 TWS 4001 埠 ---
+  - type: pserv # 關鍵修正：同上
+    name: tws-proxy-4001
+    runtime: python
+    plan: starter
+    region: singapore
+    branch: main
+    autoDeploy: false
+    startCommand: "python proxy.py"
+    envVars:
+      - key: TARGET_HOST
+        value: ndc1.ibllc.com
+      - key: TARGET_PORT
+        value: 4001
