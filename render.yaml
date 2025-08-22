@@ -1,34 +1,27 @@
-# render.yaml (Corrected Version)
 services:
-  # --- 服務一：代理 TWS 4000 埠 ---
-  - type: web # 關鍵修正：對於需要公開 TCP 埠的服務，類型應設為 'web'
+  - type: web
     name: tws-proxy-4000
     runtime: python
-    protocol: tcp # 關鍵修正：明確告訴 Render 這是一個 TCP 服務，而不是 HTTP
+    protocol: tcp
     plan: starter
     region: singapore
     branch: main
-    # 移除 'healthCheckPath'，因為它不適用於 TCP 服務
-    buildCommand: "pip install -r requirements.txt" # 建議加上 build 指令，更具可讀性
+    autoDeploy: false # 在設定完成前先關閉自動部署
     startCommand: "python proxy.py"
     envVars:
       - key: TARGET_HOST
         value: ndc1.ibllc.com
       - key: TARGET_PORT
         value: 4000
-    # 移除 'ports' 區塊。
-    # 當 'protocol' 設為 'tcp' 時，Render 會自動分配一個公開埠，
-    # 並將流量轉發到由 'PORT' 環境變數指定的內部埠 (我們的腳本會讀取它)。
 
-  # --- 服務二：代理 TWS 4001 埠 ---
-  - type: web # 關鍵修正：同上
+  - type: web
     name: tws-proxy-4001
     runtime: python
-    protocol: tcp # 關鍵修正：同上
+    protocol: tcp
     plan: starter
     region: singapore
     branch: main
-    buildCommand: "pip install -r requirements.txt"
+    autoDeploy: false # 在設定完成前先關閉自動部署
     startCommand: "python proxy.py"
     envVars:
       - key: TARGET_HOST
